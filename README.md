@@ -10,7 +10,7 @@ typedef struct Colaborador Colaborador;
 
 
 
-//Estructuras de colaborador
+*Estructuras de colaborador*
 struct Colaborador
 {
 	int cedula;
@@ -34,7 +34,7 @@ struct Arista{
 };
 
 
-//Estructuras de equipo
+*Estructuras de equipo*
 typedef struct equipo{         
 	char nombreE[70];
 	char descripcionE[200];
@@ -54,7 +54,7 @@ struct ListaE{
 NodoC *inicio = NULL;  //Nodo inicial grafo
 
 
-//Funciones
+*Funciones*
 void registrarColaborador();
 void insertarArista(int cedulas[100], int cantidad);
 void agregarArista(NodoC* aux,NodoC* aux2,Arista* nuevo, Arista* nuevo2);
@@ -84,7 +84,6 @@ void registrarColaborador()  //Insertar nodo
 	gets(nuevo->colaborador.rol);
 	printf("Indique la fecha de cumpleanos del colaborador: \n");
 	gets(nuevo->colaborador.fechaC);
-	 
 	nuevo->siguiente = NULL;
 	nuevo->adyacencia = NULL;
 	if (inicio == NULL){
@@ -140,22 +139,16 @@ void insertarArista(int cedulas[100], int cantidad)
 	NodoC *aux, *aux2;
 	int i=0,j=0,k,contador;
 	contador = cantidad-1;
-	
 	if(cantidad == 1)
 		return;
-	
 	while(j != contador){
-		
 		i=j+1;
-
 		while(i <= contador){
-			
 			Arista* nuevo=(Arista*)malloc(sizeof(Arista));
 			nuevo->siguiente = NULL;
 			Arista* nuevo2=(Arista*)malloc(sizeof(Arista));///////////////
 			nuevo2->siguiente = NULL;
 			NodoC *aux, *aux2;
-			
 			if(inicio == NULL){
 				printf("Eror: el grafo esta vacio\n");///////////////
 				return;
@@ -187,7 +180,6 @@ void insertarArista(int cedulas[100], int cantidad)
 						if(ar == NULL)
 							agregarArista(aux,aux2,nuevo,nuevo2);
 						break;
-						
 					}
 					aux = aux->siguiente;
 				}
@@ -238,23 +230,18 @@ NodoE* crearNodo(equipo equipo) {
 	nuevo = (NodoE *) malloc(sizeof(NodoE));
 	nuevo->siguiente = NULL;
 	nuevo->equipo = equipo;	 
-	
 	return nuevo;
 }
 
 void insertarEquipo(ListaE *L, equipo equipo){
-
     NodoE *nuevo= crearNodo(equipo);
     NodoE *n, *aux;
-
     if(L->inicio == NULL){
         L->inicio = nuevo;
         L->inicio->siguiente = NULL;
         return;
     }
-
     n = L->inicio;
-
     while(n!= NULL) {
         aux = n;
         n = n->siguiente;
@@ -290,7 +277,7 @@ void registrarEquipo(ListaE *L){
 	insertarArista(cedulaE, registroE); //Se insertan las aristas entre los nodos del grafo de colaboradores
 }
 
-// Muestra información recolectada
+*Muestra información recolectada*
 void mostrarLista(ListaE *L){
 	NodoE *i;
 	for(i = L->inicio; i!= NULL; i = i->siguiente)
@@ -300,18 +287,12 @@ void mostrarLista(ListaE *L){
 
 
 void menuPrincipal(){
-	
 	int eleccion;
-	
 	ListaE *L;
 	L= listaNuevaE();
-	
 	system("cls");
-	
 	while(eleccion != 12){
-		
 		printf("\n---------------------MENU-----------------------\n");
-		
 		printf("\n 1. Registrar Colaborador");
 		printf("\n 2. Registrar Equipo");
 		printf("\n 3. Mostrar Equipos (temporal)");
@@ -327,14 +308,10 @@ void menuPrincipal(){
 		putchar('\n');
 		printf("\n------------------------------------------------\n");
 		printf("\n Seleccione una opcion:");
-		
-
 		if (scanf ("%d",&eleccion) == 0){
   			for( int c = getchar(); c != EOF && c != ' ' && c != '\n' ; c = getchar());
 			eleccion = 0;
-		}
-		
-				
+		}		
 		switch(eleccion){
 			case 1:
 				registrarColaborador();
@@ -376,12 +353,10 @@ void menuPrincipal(){
 				putchar('\n');
 				printf("\nValor invalido, por favor ingrese una de las siguientes opciones: \n");
 		}
-		
 		system("pause");
         system("cls");
 	}
 }
-
 int main(){
 	menuPrincipal();
 }
