@@ -21,11 +21,21 @@ struct Colaborador
 	char fechaC[100];
 };
 
+struct Chat{
+	char remitente[100];
+	char destinatario[100];
+	char mensaje[1500];
+};
 
 struct NodoC{
 	Colaborador colaborador;
 	NodoC *siguiente;
 	Arista *adyacencia;
+};
+
+struct ListaChat{
+	NodoM *inicio;
+	NodoM *final;
 };
 
 struct Arista{
@@ -52,6 +62,24 @@ struct ListaE{
 };
 
 NodoC *inicio = NULL;  //Nodo inicial grafo
+
+void insertarChat(ListaChat *L, Chat chat){
+    NodoM *nuevo= crearNodo(chat);
+    NodoM *n, *aux;
+    if(L->inicio == NULL){
+        L->inicio = nuevo;
+        L->inicio->siguiente = NULL;
+        return;
+    }
+    n = L->inicio;
+    while(n!= NULL) {
+        aux = n;
+        n = n->siguiente;
+    }
+    aux->siguiente = nuevo;
+    aux->siguiente->siguiente = NULL;
+}
+
 
 
 *Funciones*
@@ -283,6 +311,72 @@ void mostrarLista(ListaE *L){
 	for(i = L->inicio; i!= NULL; i = i->siguiente)
 		printf("\n\n-Nombre equipo: %s \n-Descripcion: %s \n-Cantidad: %i ", i->equipo.nombreE, i->equipo.descripcionE, i->equipo.cantidadC); 
 	printf("\n");
+}
+
+void menuChat(ListaChat *L){
+	NodoC *aux;
+	NodoC *aux2;
+	NodoM *mensaje;
+	Arista *auxA;
+	Chat nuevoChat;
+	int cedulaE, eleccion;
+	char destinatario[100];
+	char colaboradorR;
+	printf("Ingrese su numero de cedula: ");
+	scanf("%i",&cedulaE);
+	if(inicio==NULL){
+		printf("No hay colaboradores registrados en el sistema, intentelo de nuevo\n");
+	}
+	for(aux=inicio; aux!=NULL; aux=aux->siguiente){
+		if(cedulaE==aux->colaborador.cedula){
+			printf("1. Enviar un nuevo mensaje \n");
+			printf("2. Bandeja de mensajes recibidos\n");
+			printf("Seleccione una opcion: ");
+			scanf("%i",&eleccion);
+			getchar();
+			switch(eleccion){
+				case 1:
+					strcpy(nuevoChat.remitente, aux->colaborador.nombre);
+					printf("Ingrese el nombre del destinatario: ");
+					gets(destinatario);
+					printf("Ingrese el mensaje que desea enviar: ");
+					gets(nuevoChat.mensaje);
+					auxA=aux->adyacencia;
+					for(auxA; auxA!=NULL; auxA=auxA->siguiente){
+						if(strcmp(destinatario, auxA->vrt->colaborador.nombre)==0){
+							strcpy(nuevoChat.destinatario, auxA->vrt->colaborador.nombre);	
+							printf("Mensaje enviado con exito!");
+							insertarChat(L,nuevoChat);
+							return;
+						}
+					}
+					for(aux2=inicio; aux2!=NULL; aux2=aux2->siguiente){
+						if(strcmp(destinatario, aux2->colaborador.nombre)==0){
+							strcpy(nuevoChat.destinatario, destinatario);
+							//Recorrido, insertar chat 
+					}
+					}	
+				case 2:
+					mensaje=L->inicio;
+					if(mensaje==NULL){
+						printf("No hay ningun mensaje, intentelo de nuevo. ");
+						printf("\n");
+					}
+					for(mensaje; mensaje!=NULL ; mensaje=mensaje->siguiente){
+						if(strcmp(aux->colaborador.nombre, mensaje->chat.destinatario )==0){
+							printf("\n-Remitente: %s \n-Destinatario: %s \n-Mensaje: %s", mensaje->chat.remitente, mensaje->chat.destinatario, mensaje->chat.mensaje);
+					}
+					}
+					break;
+				default:
+					printf("\n");
+					printf("La opcion seleccionada no es valida, vuelvalo a intentar. ");
+					printf("\n");
+			}	
+			return;
+		}
+	}
+	printf("Numero de cedula no encontrado, intentelo nuevamente. ");
 }
 
 
