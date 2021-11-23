@@ -7,6 +7,10 @@
 typedef struct NodoC NodoC;
 typedef struct Arista Arista;
 typedef struct Colaborador Colaborador;
+typedef struct ListaB ListaBitacora;
+typedef struct NodoB NodoB;
+typedef struct Bitacora Bitacora;
+
 
 
 
@@ -43,6 +47,27 @@ struct Arista{
 	Arista *siguiente;
 };
 
+*Estructuras del Chat* 
+struct Bitacora
+{
+	int cedula;
+	char fecha[10];
+	char nombreCompleto[150];
+	char detalle[150];	
+};
+
+struct NodoB
+{
+	Bitacora bitacora; 
+	NodoB *siguiente;
+	NodoB *anterior; 
+};
+
+struct ListaB
+{
+	NodoB *inicio;
+	NodoB *final;
+};
 
 *Estructuras de equipo*
 typedef struct equipo{         
@@ -89,6 +114,11 @@ void agregarArista(NodoC* aux,NodoC* aux2,Arista* nuevo, Arista* nuevo2);
 void visualizarGrafo();
 void insertarEquipo(ListaE *L);
 ListaE *listaNuevaE(void);
+void registrarBitacora(ListaBitacora *L);
+void guardarBitacora(ListaBitacora *L);
+void consultarBitacora(ListaBitacora *L);
+void cargarBitacora(ListaBitacora *L);
+
 
 
 /* ----------------------------------------------------------------------------------------------------------------------------*/ 
@@ -379,6 +409,143 @@ void menuChat(ListaChat *L){
 	printf("Numero de cedula no encontrado, intentelo nuevamente. ");
 }
 
+ListaBitacora *listaNuevaJ(void)
+{
+	ListaBitacora *L;
+	L = (ListaBitacora *) malloc(sizeof(ListaBitacora));
+	L->inicio = NULL;
+	L->final = NULL;
+	return L;
+}
+
+NodoB* crearNodo(Bitacora bitacora)  
+{
+	NodoB *nuevo;
+	nuevo = (NodoB *) malloc(sizeof(NodoB));
+	nuevo->anterior = NULL;
+	nuevo->siguiente = NULL;
+	nuevo->bitacora = bitacora;	 
+	
+	return nuevo;
+}
+
+*Entradas: crear un nuevo nodo que apunte al jugador que se va a insertar*
+*Salidas: inserta un jugador al incio de la lista *
+*Restricciones: se debe validad que se cree el nodo*
+
+void insertarJugador(ListaBitacora *L, Bitacora bitacora)
+{
+	if(L->inicio == NULL) //Valida si la lista está vacía
+	{
+		//Inserta al inicio de la lista
+		L->inicio = crearNodo(bitacora);   
+		L->final = L->inicio;
+		return;
+	}
+	
+	//Inserta el dato al final de la lista, no necesita un ciclo porque tiene el puntero final
+	L->final->siguiente = crearNodo(bitacora);  
+	L->final->siguiente->anterior = L->final;
+	L->final = L->final->siguiente;
+}
+
+*Entradas: crear un nuevo nodo que apunte al jugador que se va a insertar*
+*Salidas: inserta un jugador al incio de la lista *
+*Restricciones: se debe validad que se cree el nodo*
+
+void registrarBitacora(ListaBitacora *L)
+{
+	Bitacora nuevoJugador;
+	NodoB *i = L->inicio;
+	printf("Inserte la cedula del colaborador: \n"); 
+	if(scanf("%d",&nuevoJugador.cedula)==0){
+		for( int c = getchar(); c != EOF && c != ' ' && c != '\n' ; c = getchar());
+		printf("\nLa cedula tiene que ser de datos numericos\n\n");
+		registrarBitacora(L);
+		return;
+	}
+	getchar();
+    printf("\n");
+    printf("Ingrese la fecha de hoy: (DD/MM/AAAA) "); gets(nuevoJugador.fecha);  
+    printf("\n");
+    printf("Inserte el nombre completo del colaborador: "); gets(nuevoJugador.nombreCompleto);  
+    printf("\n");
+    printf("Ingrese el detalle correspondiente:  "); gets(nuevoJugador.detalle);
+   	printf("\n");
+    insertarJugador(L,nuevoJugador);
+	printf("\nDatos del jugador %s guardados\n", nuevoJugador.nombreCompleto)
+}
+
+*Entradas: la lista con los jugadores*
+*Salidas: crear un archivo que contenga la información de los jugadores*
+*Restricciones: se debe validar que se hayn guardado los jugadores correctamente en el archivo*
+
+void guardarBitacora(ListaBitacora *L){
+	printf("\n\n\nGuardando la informacion de los colaboradores en la bitácora");
+	FILE * archivo = fopen("Bitacora.dat", "wb");
+	if(archivo == NULL){
+		printf("\n\n\nError al guardar en archivo");
+		return;
+	}
+	NodoB * curr = L->inicio;
+	while (curr != NULL){
+		fwrite(&(curr->bitacora), sizeof(Bitacora), 1, archivo); 
+		curr = curr->siguiente;
+		}
+	fclose(archivo);
+}
+
+*Entradas: la lista con la información de los jugaodres*
+*Salidas: cargar el archivo con la información de los jugadores*
+*Restricciones: se debe verficar que se ha cargado correctamente el archivo*
+
+void cargarBitacora(ListaBitacora *L){
+	FILE * archivo = fopen("Bitacora.dat", "rb");
+	if(archivo == NULL){
+		printf("\n\n\nError al cargar desde archivo");
+		return;
+	}
+	Bitacora bitacora; 
+	int leidos;
+	do{
+		leidos = fread(&(bitacora), sizeof(Bitacora), 1, archivo);
+		if (leidos == 1)
+			insertarJugador(L, bitacora);
+	} while (leidos == 1);
+ 	printf("\nSe cargaron los detalles de la bitácora en el archivo\n");
+	fclose(archivo);
+}
+
+*Entradas: cedula ingresada, funciona como identificador unico*
+*Salidas: información del usuario o jugador*
+*Restricciones: cedula debe existir en la lista*
+
+void consultarBitacora(ListaBitacora *L)
+{
+	int eleccion, cedula;
+	NodoB *i;
+	if (L== NULL){
+		printf("No hay registros de dicho colaborador");
+	}
+	for(i = L->inicio; i!= NULL; i = i->siguiente)
+		printf("\n\n-Nombre completo: %s  \n-Cedula: %i ", i->bitacora.nombreCompleto, i->bitacora.cedula);  
+	i= L->inicio;
+	printf("\n");
+	printf ("Digite el numero de cedula del colaborador a consultar: ");
+	if (scanf("%d", &cedula)==0){
+		for( int c = getchar(); c != EOF && c != ' ' && c != '\n' ; c = getchar());
+			cedula=01020162;
+	}
+	for(i; i != NULL; i = i->siguiente){
+		if (cedula == i->bitacora.cedula){
+			printf("\n \nFecha: %s \n-Nombre completo: %s \n-Cedula: %d \n-Detalle: %s", i->bitacora.fecha, i->bitacora.nombreCompleto, i->bitacora.cedula, i->bitacora.detalle);   ///cambio, aqui solo estoy imprimiendo el nombre de cada jugador
+			printf("\n");
+			return;
+		}
+	}
+	printf("\nNo hay registros de dicho colaborador en la bitácora\n");
+}
+
 
 void menuPrincipal(){
 	int eleccion;
@@ -391,8 +558,8 @@ void menuPrincipal(){
 		printf("\n 2. Registrar Equipo");
 		printf("\n 3. Mostrar Equipos (temporal)");
 		printf("\n 4. Mostrar grafo de colaboradores (temporal)");
-		printf("\n 5. Aux");
-		printf("\n 6. Aux");
+		printf("\n 5. Ingresar/Actualizar Bitácora");
+		printf("\n 6. Ver Bitácora");
 		printf("\n 7. Aux");
 		printf("\n 8. Aux");
 		printf("\n 9. Aux");
@@ -420,10 +587,10 @@ void menuPrincipal(){
 				visualizarGrafo();
 				break;
 			case 5:
-				///////////
+				registrarBitacora(L2);
 				break;
 			case 6:
-				//////////
+				consultarBitacora(L2);
 				break;
 			case 7:
 				//////////
